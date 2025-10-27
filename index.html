@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Меню школы</title>
+<style>
+  body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+  h1 { color: #2a7ae2; }
+  .menu { background: #fff; padding: 20px; border-radius: 8px; max-width: 400px; }
+  .menu p { margin: 5px 0; }
+</style>
+</head>
+<body>
+
+<h1>Меню школы</h1>
+<div class="menu" id="menu">
+  <p>Загрузка меню...</p>
+</div>
+
+<script>
+// https://docs.google.com/spreadsheets/d/e/2PACX-1vSfTgyLH5DTfJJ0oaU4UDOsgprJeOuxgakSIXxrY0vGLmQIkPEOdzB4IWbe3kiqY5RRZGhHKEUbIdLp/pubhtml
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOpQrStUvWxYz1234567890/gviz/tq?tqx=out:csv&sheet=Menu';
+
+function fetchMenu() {
+  fetch(CSV_URL)
+    .then(res => res.text())
+    .then(data => {
+      const lines = data.split('\n').slice(1);
+      const today = new Date().toISOString().split('T')[0];
+      let menuHTML = '<p>Меню на сегодня не найдено</p>';
+
+      for (let line of lines) {
+        const [date, breakfast, lunch, dinner] = line.split(',');
+        if (date.trim() === today) {
+          menuHTML = `
+            <p><strong>Завтрак:</strong> ${breakfast}</p>
+            <p><strong>Обед:</strong> ${lunch}</p>
+            <p><strong>Ужин:</strong> ${dinner}</p>
+          `;
+          break;
+        }
+      }
+
+      document.getElementById('menu').innerHTML = menuHTML;
+    })
+    .catch(err => {
+      document.getElementById('menu').innerHTML = '<p>Ошибка загрузки меню</p>';
+      console.error(err);
+    });
+}
+
+fetchMenu();
+</script>
+
+</body>
+</html>
